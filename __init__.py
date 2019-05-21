@@ -61,23 +61,19 @@ def init(cbpi):
     log("Brewfather brewfather_custom_stream %s" % brewfather_custom_stream)
 
     if brewfather_comment is None:
-	log("Init brewfather config Comment")
+        log("Init brewfather config Comment")
 	try:
-	    cbpi.add_config_parameter("brewfather_comment", "", "text", "Brewfather comment")
+        cbpi.add_config_parameter("brewfather_comment", "", "text", "Brewfather comment")
 	except:
-	    cbpi.notify("Brewfather Error", "Unable to update Brewfather comment parameter", type="danger")
+        cbpi.notify("Brewfather Error", "Unable to update Brewfather comment parameter", type="danger")
     if brewfather_custom_stream is None:
-	log("Init brewfather config URL")
-	try:
-# TODO: is param2 a default value?
-	    cbpi.add_config_parameter("brewfather_custom_stream", "", "text", "Brewfather custom string")
-	except:
-	    cbpi.notify("Brewfather Error", "Unable to update Brewfather custom string parameter", type="danger")
+        log("Init brewfather config URL")
+    try:
+        cbpi.add_config_parameter("brewfather_custom_stream", "", "text", "Brewfather custom string")
+    except:
+        cbpi.notify("Brewfather Error", "Unable to update Brewfather custom string parameter", type="danger")
 
     log("Brewfather params ends")
-
-
-
 
 
 # interval=900 is 900 seconds, 15 minutes, same as the Tilt Android App logs.
@@ -95,36 +91,23 @@ def brewfather_temp_background_task(api):
 
     now = datetime.datetime.now()
     for key, value in cbpi.cache.get("sensors").iteritems():
-	log("key %s value.name %s value.instance.last_value %s" % (key, value.name, value.instance.last_value))
-#
-# TODO: IMPORTANT - Temp sensor must be defined preceeding Gravity sensor and
-#		    each Tilt must be defined as a pair without another Tilt
-#		    defined between them, e.g.
-#			RED Temperature
-#			RED Gravity
-#			PINK Temperature
-#			PINK Gravity
-#
-	if (value.type == "ONE_WIRE_SENSOR"):
-# A Tilt Temperature device is the first of the Tilt pair of sensors so
-#    reset the data block to empty
-		payload = "{ "
-		payload += " \"name\": \"CraftBeerPi\",\r\n"
-
-		temp = value.instance.last_value
-# brewfather expects *F so convert back if we use C
-		unit = cbpi.get_config_parameter("unit",None)
-        payload += " \"temp\": \"%s\",\r\n" % temp
-        payload += " \"temp_unit\": \"%s\",\r\n" % unit
-        payload += " \"comment\": \"%s\" }" % cbpi.get_config_parameter("brewfather_comment", None)
-        log("Payload %s" % payload)
-        url = "http://log.brewfather.net/stream"
-        headers = {
-        'Content-Type': "application/json",
-        'Cache-Control': "no-cache"
-        }
-        id = cbpi.get_config_parameter("brewfather_custom_stream", None)
-        querystring = {"id":id}
-        r = requests.request("POST", url, data=payload, headers=headers, params=querystring)
-        log("Result %s" % r.text)
+        log("key %s value.name %s value.instance.last_value %s" % (key, value.name, value.instance.last_value))
+        if (value.type == "ONE_WIRE_SENSOR"):
+            payload = "{ "
+            payload += " \"name\": \"CraftBeerPi\",\r\n"
+            temp = value.instance.last_value
+            unit = cbpi.get_config_parameter("unit",None)
+            payload += " \"temp\": \"%s\",\r\n" % temp
+            payload += " \"temp_unit\": \"%s\",\r\n" % unit
+            payload += " \"comment\": \"%s\" }" % cbpi.get_config_parameter("brewfather_comment", None)
+            log("Payload %s" % payload)
+            url = "http://log.brewfather.net/stream"
+            headers = {
+                'Content-Type': "application/json",
+                'Cache-Control': "no-cache"
+            }
+            id = cbpi.get_config_parameter("brewfather_custom_stream", None)
+            querystring = {"id":id}
+            r = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+            log("Result %s" % r.text)
     log("brewfather done")
