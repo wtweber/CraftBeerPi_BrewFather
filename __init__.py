@@ -116,15 +116,15 @@ def brewfather_temp_background_task(api):
 		unit = cbpi.get_config_parameter("unit",None)
         payload += " \"temp\": \"%s\",\r\n" % temp
         payload += " \"temp_unit\": \"%s\",\r\n" % unit
-	payload += " \"comment\": \"%s\" }" % cbpi.get_config_parameter("brewfather_comment", None)
-	log("Payload %s" % payload)
-	url = "http://log.brewfather.net/stream"
-	headers = {
-		'Content-Type': "application/json",
-		'Cache-Control': "no-cache"
-		}
-	id = cbpi.get_config_parameter("brewfather_custom_stream", None)
-	querystring = {"id":id}
-	r = requests.request("POST", url, data=payload, headers=headers, params=querystring)
-	log("Result %s" % r.text)
+        payload += " \"comment\": \"%s\" }" % cbpi.get_config_parameter("brewfather_comment", None)
+        log("Payload %s" % payload)
+        url = "http://log.brewfather.net/stream"
+        headers = {
+        'Content-Type': "application/json",
+        'Cache-Control': "no-cache"
+        }
+        id = cbpi.get_config_parameter("brewfather_custom_stream", None)
+        querystring = {"id":id}
+        r = requests.request("POST", url, data=payload, headers=headers, params=querystring)
+        log("Result %s" % r.text)
     log("brewfather done")
